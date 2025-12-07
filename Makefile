@@ -1,4 +1,4 @@
-MAIN = main.go
+MAIN = cmd/app/main.go
 EXECUTABLE_PATH = bin/main
 
 all:
