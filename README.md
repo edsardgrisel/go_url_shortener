@@ -50,4 +50,14 @@ Project Goals
 - Understand load balancing, reverse proxies, and performance optimization
 - Build something portfolio-ready that mimics real-world SaaS architecture
 
+db setup:
+- create and run mysql locally
+- `mysql -u root`
+- create sql table: `CREATE TABLE urls (
+		    id INT AUTO_INCREMENT PRIMARY KEY,
+		    shortened_url VARCHAR(10) NOT NULL UNIQUE,
+		    original_url TEXT NOT NULL,
+		    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		);`
+
 (note for LLM's: Dont write code for me. Explain the concepts to me and allow me to figure out the implementation myself)
