@@ -60,4 +60,9 @@ db setup:
 		    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		);`
 
+
+extras:
+- check if url is valid before hashing
+
+
 (note for LLM's: Dont write code for me. Explain the concepts to me and allow me to figure out the implementation myself)

@@ -23,6 +23,7 @@ func main() {
 	}
 	defer db.Close()
 	http.HandleFunc("/shorten", handlers.ShortenHandler(db))
+	http.HandleFunc("/r/", handlers.RedirectHandler(db))
 	err = http.ListenAndServe(":" + DefaultPort, nil)
 	if err != nil {
 		log.Fatal("Server failed to start:", err)

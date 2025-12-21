@@ -3,25 +3,20 @@ package handlers
 import (
 	"database/sql"
 	"errors"
-	"fmt"
-	"io"
 	"net/http"
+	"strings"
 
 	"github.com/edsardgrisel/go_url_shortener/internal/services"
 )
 
-func ShortenHandler(db *sql.DB) http.HandlerFunc {
+func RedirectHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		if req.Method != http.MethodPost {
+		if req.Method != http.MethodGet {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		body, err := io.ReadAll(req.Body)
-		if err != nil {
-			http.Error(w, "Failed to read request body", http.StatusBadRequest)
-			return
-		}
-		s_url, err := services.UrlShortener(db, string(body))
+		s_url := strings.TrimPrefix(req.URL.Path, "/r/");
+		o_url, err := services.GetOriginalUrl(db, s_url)
 		if err != nil {
 			switch {
 			case errors.Is(err, services.ErrEmptyURL):
@@ -30,15 +25,14 @@ func ShortenHandler(db *sql.DB) http.HandlerFunc {
 			case errors.Is(err, services.ErrDatabase):
 				http.Error(w, "Database failure", http.StatusInternalServerError)
 				return
-			case errors.Is(err, services.ErrGenerationFailed):
-				http.Error(w, "Unable to generate shortened URL", http.StatusInternalServerError)
+			case errors.Is(err, services.ErrURLNotFound):
+				http.Error(w, "URL not found", http.StatusNotFound)
 				return
 			default:
 				http.Error(w, "Internal server error", http.StatusInternalServerError)
 				return
 			}
 		}
-		w.WriteHeader(http.StatusCreated)
-		fmt.Fprint(w, s_url)
+		http.Redirect(w, req, o_url, http.StatusFound)
 	}
 }

@@ -20,7 +20,10 @@ func exists(db *sql.DB, s_url string) bool {
 	return count > 0
 }
 
-func UrlShortener(db *sql.DB, url string) string {
+func UrlShortener(db *sql.DB, url string) (string, error) {
+	if url == "" {
+		return "", ErrEmptyURL
+	}
 	salt := ""
 	maxAttemps := 100
 	var s_url string
@@ -36,13 +39,13 @@ func UrlShortener(db *sql.DB, url string) string {
 		maxAttemps--
 	}
 	if s_url == "" {
-		return ""
+		return "", ErrGenerationFailed
 	}
 	ctx := context.Background()
-	query := "INSERT INTO urls (shortened_url, original_url) VALUE (?, ?)"
+	query := "INSERT INTO urls (shortened_url, original_url) VALUES (?, ?)"
 	_, err := db.ExecContext(ctx, query, s_url, url)
 	if err != nil {
-		return ""
+		return "", ErrDatabase
 	}
-	return s_url
+	return s_url, nil
 }
