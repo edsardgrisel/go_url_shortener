@@ -12,18 +12,34 @@ all:
 	mkdir -p bin
 	go build -o $(EXECUTABLE_PATH) $(MAIN)
 
-run: all
+mysql-start:
 	@echo "$(BLUE)Starting MySQL database$(NC)"
 	brew services start mysql
+
+mysql-stop:
+	@echo "$(RED)Stopping MySQL database$(NC)"
+	brew services stop mysql
+
+redis-start:
+	@echo "$(BLUE)Starting Redis server$(NC)"
+	brew services start redis
+
+redis-stop:
+	@echo "$(RED)Stopping Redis server$(NC)"
+	brew services stop redis
+
+services-start: mysql-start redis-start
+	@echo "$(GREEN)All services started$(NC)"
+
+services-stop: mysql-stop redis-stop
+	@echo "$(GREEN)All services stopped$(NC)"
+
+run: all services-start
 	@echo "$(BLUE)Starting application$(NC)"
 	./$(EXECUTABLE_PATH)
 
-dev:
+dev: services-start
 	go run $(MAIN)
-
-stop:
-	@echo "$(RED)Stopping MySQL database$(NC)"
-	brew services stop mysql
 
 clean:
 	@echo "$(YELLOW)Cleaning build files$(NC)"

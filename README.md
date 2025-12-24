@@ -35,6 +35,10 @@ URL shortening system written in Go to help me practice backend engineering, sca
 - Horizontal scaling with multiple Go API replicas behind NGINX
 - Graceful shutdown and concurrent request handling
 
+## Redis implementation ##
+- Uses cache aside pattern ⏳
+- Rate limiting ⏳
+
 ## Data Model ## 
 	urls table: ✅
 		- domain
