@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -16,6 +17,7 @@ func GetOriginalUrl(db *sql.DB, rdb *redis.Client, s_url string) (string, error)
 	cacheKey := "url:" + s_url
 	val, err := rdb.Get(ctx, cacheKey).Result()
 	if err == nil {
+		fmt.Printf("Cache hit")
 		return val, nil
 	}
 	query := "SELECT original_url FROM urls WHERE shortened_url = ?"

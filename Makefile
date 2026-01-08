@@ -38,6 +38,30 @@ run: all services-start
 	@echo "$(BLUE)Starting application$(NC)"
 	./$(EXECUTABLE_PATH)
 
+run-background: all services-start
+	@echo "$(BLUE)Starting application in the background$(NC)"
+	./$(EXECUTABLE_PATH) &
+
+cache-performance: run-background
+	@echo "$(YELLOW)Waiting for server to start...$(NC)"
+	@for i in {1..10}; do \
+		sleep 1; \
+		if curl -s http://localhost:8090/shorten > /dev/null 2>&1; then \
+			echo "$(GREEN) Server is running$(NC)"; \
+			break; \
+		fi; \
+		if [ $$i -ge 10 ]; then \
+			echo "$(RED)Server failed to start$(NC)"; \
+			pkill -f "$(EXECUTABLE_PATH)" || true; \
+			exit 1; \
+		fi; \
+	done;
+	chmod +x cache_performance_test.sh
+	./cache_performance_test.sh
+	@echo "$(RED)Cleaning up background server...$(NC)"
+	@$(MAKE) services-stop
+	@pkill -f "$(EXECUTABLE_PATH)" || true
+
 dev: services-start
 	go run $(MAIN)
 
@@ -47,4 +71,4 @@ clean:
 
 re: clean all
 
-.PHONY: all run dev clean re
+.PHONY: all run dev clean re mysql-start mysql-stop redis-start redis-stop services-start services-stop run-background cache-performance
