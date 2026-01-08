@@ -17,13 +17,21 @@ var db *sql.DB
 
 func main() {
 	var err error
+
 	db, err = database.Connect()
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
-	http.HandleFunc("/shorten", handlers.ShortenHandler(db))
-	http.HandleFunc("/r/", handlers.RedirectHandler(db))
+
+	rdb, err := database.ConnectRedis()
+	if err != nil {
+		log.Fatal("Failed to connect to Redis:", err)
+	}
+	defer rdb.Close()
+
+	http.HandleFunc("/shorten", handlers.ShortenHandler(db, rdb))
+	http.HandleFunc("/r/", handlers.RedirectHandler(db, rdb))
 	err = http.ListenAndServe(":" + DefaultPort, nil)
 	if err != nil {
 		log.Fatal("Server failed to start:", err)

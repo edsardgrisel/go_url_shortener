@@ -7,6 +7,9 @@ import (
 	"encoding/hex"
 	"math/rand"
 	"strconv"
+	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func exists(db *sql.DB, s_url string) bool {
@@ -20,14 +23,14 @@ func exists(db *sql.DB, s_url string) bool {
 	return count > 0
 }
 
-func UrlShortener(db *sql.DB, url string) (string, error) {
+func UrlShortener(db *sql.DB, rdb *redis.Client, url string) (string, error) {
 	if url == "" {
 		return "", ErrEmptyURL
 	}
 	salt := ""
 	maxAttemps := 100
 	var s_url string
-	for maxAttemps > 0{
+	for maxAttemps > 0 {
 		hasher := sha1.New()
 		hasher.Write([]byte(url + salt))
 		hash := hasher.Sum(nil)
@@ -47,5 +50,6 @@ func UrlShortener(db *sql.DB, url string) (string, error) {
 	if err != nil {
 		return "", ErrDatabase
 	}
+	rdb.Set(ctx, "url:"+s_url, url, time.Hour)
 	return s_url, nil
 }

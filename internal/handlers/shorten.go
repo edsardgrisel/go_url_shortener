@@ -8,9 +8,10 @@ import (
 	"net/http"
 
 	"github.com/edsardgrisel/go_url_shortener/internal/services"
+	"github.com/redis/go-redis/v9"
 )
 
-func ShortenHandler(db *sql.DB) http.HandlerFunc {
+func ShortenHandler(db *sql.DB, rdb *redis.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if req.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -21,7 +22,7 @@ func ShortenHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w, "Failed to read request body", http.StatusBadRequest)
 			return
 		}
-		s_url, err := services.UrlShortener(db, string(body))
+		s_url, err := services.UrlShortener(db, rdb, string(body))
 		if err != nil {
 			switch {
 			case errors.Is(err, services.ErrEmptyURL):

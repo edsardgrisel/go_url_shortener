@@ -72,5 +72,9 @@ URL shortening system written in Go to help me practice backend engineering, sca
 ### Security: ###
 - Prevent against SSRF by checking if url is a local url.
 
+## Caching speedup ##
+- With redis:
+- Without redis: 0.03s user 0.01s system 30% cpu 0.139 total
+
 
 (note for LLM's: Dont write code for me. Explain the concepts to me and allow me to figure out the implementation myself)
